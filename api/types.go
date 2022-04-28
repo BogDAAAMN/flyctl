@@ -1213,7 +1213,7 @@ type machineImageRef struct {
 	Digest     string
 }
 
-type machineEvent struct {
+type MachineEventt struct {
 	Type      string `json:"type"`
 	Status    string `json:"status"`
 	Request   any    `json:"request,omitempty"`
@@ -1232,9 +1232,9 @@ type V1Machine struct {
 	InstanceID string `json:"instance_id"`
 
 	// PrivateIP is the internal 6PN address of the machine.
-	PrivateIP string          `json:"private_ip"`
-	CreatedAt string          `json:"created_at"`
-	Events    []*machineEvent `json:"events,omitempty"`
+	PrivateIP string           `json:"private_ip"`
+	CreatedAt string           `json:"created_at"`
+	Events    []*MachineEventt `json:"events,omitempty"`
 }
 
 type V1MachineStop struct {
