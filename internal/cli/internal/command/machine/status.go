@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/superfly/flyctl/api"
 	"github.com/superfly/flyctl/internal/cli/internal/app"
 	"github.com/superfly/flyctl/internal/cli/internal/command"
+	"github.com/superfly/flyctl/internal/cli/internal/render"
 	"github.com/superfly/flyctl/internal/client"
 	"github.com/superfly/flyctl/internal/flag"
 	"github.com/superfly/flyctl/pkg/flaps"
@@ -79,29 +81,22 @@ func runMachineStatus(ctx context.Context) error {
 		return fmt.Errorf("machine %s could not be retrieved", machineID)
 	}
 
-	machine.Events = append(machine.Events, &api.MachineEventt{
-		Type:      "Exit",
-		Status:    "404",
-		Request:   "",
-		Source:    "",
-		Timestamp: 543,
-	})
-	machine.Events = append(machine.Events, &api.MachineEventt{
-		Type:      "Exit",
-		Status:    "300",
-		Request:   "",
-		Source:    "",
-		Timestamp: 345,
-	})
+	eventLogs := [][]string{}
 
 	fmt.Fprintf(io.Out, "Success! A machine has been retrieved\n")
 	fmt.Fprintf(io.Out, " Machine ID: %s\n", machine.ID)
 	fmt.Fprintf(io.Out, " Instance ID: %s\n", machine.InstanceID)
-	fmt.Fprintf(io.Out, " State: %s\n", machine.State)
-	fmt.Fprintf(io.Out, " Event Logs \n")
+	fmt.Fprintf(io.Out, " State: %s\n\n", machine.State)
 	for _, event := range machine.Events {
-		fmt.Fprintf(io.Out, " %d %s %s \n", event.Timestamp, event.Type, event.Status)
+		timeInUTC := time.Unix(0, event.Timestamp*int64(time.Millisecond))
+		eventLogs = append(eventLogs, []string{
+			event.Status,
+			event.Type,
+			event.Source,
+			timeInUTC.Format(time.RFC3339Nano),
+		})
 	}
+	_ = render.Table(io.Out, "Event Logs", eventLogs, "Machine Status", "Event Type", "Source", "Timestamp")
 
 	return nil
 }
