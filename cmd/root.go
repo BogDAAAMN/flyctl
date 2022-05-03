@@ -68,6 +68,7 @@ func NewRootCmd(client *client.Client) *cobra.Command {
 		newVMCommand(client),
 		newLaunchCommand(client),
 		newTurbokuCommand(client),
+		newFigGenCommand(),
 	)
 
 	return rootCmd.Command
